@@ -4,21 +4,23 @@ use std::io::{BufRead, BufReader};
 
 use itertools::Itertools;
 
-fn part1(input: &HashSet<i32>) -> i32 {
+fn part1<T>(input: &HashSet<T>, goal: T) -> T
+  where T : Eq + std::hash::Hash + Copy + std::ops::Sub<Output=T> + std::ops::Mul<Output=T> {
     return input
         .iter()
-        .map(|a| (a, 2020 - a))
+        .map(|a| (*a, goal - *a))
         .filter(|(_, b)| input.contains(b))
         .map(|(a, b)| a * b)
         .next()
         .unwrap();
 }
 
-fn part2(input: &HashSet<i32>) -> i32 {
+fn part2<T>(input: &HashSet<T>, goal: T) -> T
+  where T : Eq + std::hash::Hash + Copy + std::ops::Sub<Output=T> + std::ops::Mul<Output=T> {
     return input
         .iter()
         .cartesian_product(input.iter())
-        .map(|(a, b)| (a, b, 2020 - *a - *b))
+        .map(|(a, b)| (*a, *b, goal - *a - *b))
         .filter(|(_, _, c)| input.contains(c))
         .map(|(a, b, c)| a * b * c)
         .next()
@@ -30,11 +32,11 @@ fn main() {
 
     let input: HashSet<i32> = BufReader::new(File::open("input/puzzle.txt").unwrap())
         .lines()
-        .map(|nr| nr.unwrap().parse::<i32>().unwrap())
+        .map(|nr| nr.unwrap().parse().unwrap())
         .collect();
 
-    println!("Part 1 Solution: {}", part1(&input));
-    println!("Part 2 Solution: {}", part2(&input));
+    println!("Part 1 Solution: {}", part1(&input, 2020));
+    println!("Part 2 Solution: {}", part2(&input, 2020));
 }
 
 #[cfg(test)]
@@ -53,7 +55,7 @@ mod tests {
             .map(|l| l.parse().unwrap())
             .collect();
 
-        assert_eq!(514579, part1(&input));
+        assert_eq!(514579, part1(&input, 2020));
     }
 
     #[test]
@@ -68,6 +70,6 @@ mod tests {
             .map(|l| l.parse().unwrap())
             .collect();
 
-        assert_eq!(241861950, part2(&input));
+        assert_eq!(241861950, part2(&input, 2020));
     }
 }
